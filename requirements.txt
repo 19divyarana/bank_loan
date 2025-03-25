@@ -1,4 +1,6 @@
 Flask 
 scikit-learn
 joblib
+xgboost
+numpy
 gunicorn
