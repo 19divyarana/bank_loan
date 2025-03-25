@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loan Fraud Detection</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: #fff;
+            text-align: center;
+            padding: 50px;
+        }
+        .container {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+        }
+        .btn-custom {
+            background-color: #ff9800;
+            border: none;
+        }
+        .btn-custom:hover {
+            background-color: #e68900;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏦 Loan Fraud Detection</h1>
+        <p>Enter the details below to check if a transaction is fraudulent.</p>
+        <form action="/predict" method="post">
+            <label for="amount">💰 Amount:</label>
+            <input type="number" name="amount" min="1" required class="form-control mb-3">
+            
+            <label for="oldbalanceOrg">🏦 Old Balance (Origin):</label>
+            <input type="number" name="oldbalanceOrg" min="0" required class="form-control mb-3">
+            
+            <label for="newbalanceOrig">🏦 New Balance (Origin):</label>
+            <input type="number" name="newbalanceOrig" min="0" required class="form-control mb-3">
+            
+            <label for="transaction_type">🔄 Transaction Type:</label>
+            <select name="transaction_type" class="form-control mb-3">
+                <option value="CASH_OUT">CASH_OUT</option>
+                <option value="TRANSFER">TRANSFER</option>
+            </select>
+            
+            <button type="submit" class="btn btn-custom btn-lg">🔍 Check Fraud</button>
+        </form>
+    </div>
+</body>
+</html>
