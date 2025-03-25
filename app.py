@@ -6,6 +6,7 @@ app = Flask(__name__)
 
 # Load trained model and scaler
 model = joblib.load("model.pkl")
+scaler = joblib.load("scaler.pkl")
 
 @app.route('/')
 def home():
