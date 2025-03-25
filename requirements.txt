@@ -4,4 +4,3 @@ joblib
 gunicorn
 xgboost
 numpy
-sklearn
