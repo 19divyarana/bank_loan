@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loan Fraud Detection Result</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: #fff;
+            text-align: center;
+            padding: 50px;
+        }
+        .container {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+        }
+        .result-box {
+            font-size: 24px;
+            font-weight: bold;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        .fraud {
+            background-color: #d9534f;
+        }
+        .legit {
+            background-color: #5cb85c;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏦 Loan Fraud Detection Result</h1>
+        <p>Here is the analysis of your transaction:</p>
+        
+        <div class="result-box {{ 'fraud' if prediction == '🚨 Fraudulent Transaction Detected!' else 'legit' }}">
+            {{ prediction }}
+        </div>
+        
+        <a href="/" class="btn btn-custom btn-lg mt-4">🔄 Check Another Transaction</a>
+    </div>
+</body>
+</html>
