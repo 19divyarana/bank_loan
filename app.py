@@ -6,11 +6,10 @@ app = Flask(__name__)
 
 # Load trained model and scaler
 model = joblib.load("model.pkl")
-scaler = joblib.load("scaler.pkl")  # If you used scaling during training
 
 @app.route('/')
 def home():
-    return render_template("index.html")
+    return render_template("home.html")
 
 @app.route('/predict', methods=['POST'])
 def predict():
