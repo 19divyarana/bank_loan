@@ -1,28 +1,27 @@
-from flask import Flask, request, jsonify
+from flask import Flask, render_template, request, jsonify
 import joblib
 import numpy as np
 
 app = Flask(__name__)
 
-# Load the trained XGBoost model
+# Load the trained model
 model = joblib.load("model.pkl")
 
 @app.route('/')
 def home():
-    return "Bank Loan Fraud Detection API is Running!"
+    return render_template("home.html")
 
 @app.route('/predict', methods=['POST'])
 def predict():
     try:
-        data = request.get_json()
-        amount = float(data['amount'])
-        oldbalanceOrg = float(data['oldbalanceOrg'])
-        newbalanceOrig = float(data['newbalanceOrig'])
-        transaction_type = data['transaction_type']
+        amount = float(request.form['amount'])
+        oldbalanceOrg = float(request.form['oldbalanceOrg'])
+        newbalanceOrig = float(request.form['newbalanceOrig'])
+        transaction_type = request.form['type']
 
-        # Convert transaction type to numerical
+        # Convert transaction type to numerical encoding
         type_mapping = {"CASH_OUT": 1, "TRANSFER": 2}
-        type_encoded = type_mapping.get(transaction_type, 0)
+        type_encoded = type_mapping.get(type, 0)
 
         # Prepare input for model
         input_data = np.array([[amount, oldbalanceOrg, newbalanceOrig, type_encoded]])
@@ -31,10 +30,11 @@ def predict():
 
         result = {
             "fraudulent": True if fraud_prediction == 1 else False,
-            "message": "Fraudulent Transaction Detected!" if fraud_prediction == 1 else "Transaction is Legitimate."
+            "message": "🚨 Fraudulent Transaction Detected!" if fraud_prediction == 1 else "✅ Transaction is Legitimate."
         }
 
-        return jsonify(result)
+        return render_template("result.html", prediction=result["message"])
+    
     except Exception as e:
         return jsonify({"error": str(e)})
 
