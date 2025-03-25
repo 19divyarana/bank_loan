@@ -4,39 +4,48 @@ import numpy as np
 
 app = Flask(__name__)
 
-# Load the trained model
+# Load trained model and scaler
 model = joblib.load("model.pkl")
+scaler = joblib.load("scaler.pkl")  # If you used scaling during training
 
 @app.route('/')
 def home():
-    return render_template("home.html")
+    return render_template("index.html")
 
 @app.route('/predict', methods=['POST'])
 def predict():
     try:
-        # Validate and get form data
+        # Collect all 10 input features (update based on your dataset)
         amount = request.form.get('amount', type=float)
         oldbalanceOrg = request.form.get('oldbalanceOrg', type=float)
         newbalanceOrig = request.form.get('newbalanceOrig', type=float)
-        transaction_type = request.form.get('type')
+        transaction_type = request.form.get('transaction_type')
 
-        # Check if any required field is missing
-        if None in (amount, oldbalanceOrg, newbalanceOrig,type):
-            return jsonify({"error": "Missing input values"}), 400
+        # Example: Additional features (Modify based on your dataset)
+        step = request.form.get('step', type=int)
+        newbalanceDest = request.form.get('newbalanceDest', type=float)
+        oldbalanceDest = request.form.get('oldbalanceDest', type=float)
+        isFlaggedFraud = request.form.get('isFlaggedFraud', type=int, default=0)
 
         # Convert transaction type to numerical encoding
         type_mapping = {"CASH_OUT": 1, "TRANSFER": 2}
         type_encoded = type_mapping.get(transaction_type, 0)
 
-        # Prepare input for model
-        input_data = np.array([[amount, oldbalanceOrg, newbalanceOrig, type_encoded]])
-        prediction = model.predict(input_data)
+        # Ensure all features are included
+        feature_array = np.array([[step, amount, oldbalanceOrg, newbalanceOrig, 
+                                   oldbalanceDest, newbalanceDest, type_encoded, isFlaggedFraud]])
+
+        # If a scaler was used, apply it
+        scaled_features = scaler.transform(feature_array)  
+
+        # Predict fraud
+        prediction = model.predict(scaled_features)
         fraud_prediction = int(prediction[0])
 
         result = "🚨 Fraudulent Transaction Detected!" if fraud_prediction == 1 else "✅ Transaction is Legitimate."
 
         return render_template("result.html", prediction=result)
-    
+
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
