@@ -1,52 +1,46 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[11]:
-
-
-import streamlit as st
+from flask import Flask, request, jsonify
 import joblib
-import pandas as pd
 import numpy as np
+
+app = Flask(__name__)
 
 # Load the trained XGBoost model
 model = joblib.load("fraud_detection_model.pkl")
 
-# Streamlit UI
-st.title("🚀 Bank Loan Fraud Detection using XGBoost")
-st.write("Enter loan details to predict if it's fraudulent or not.")
+@app.route('/')
+def home():
+    return "Bank Loan Fraud Detection API is Running!"
 
-# Input fields
-amount = st.number_input("Transaction Amount", min_value=0.0, step=0.01)
-oldbalanceOrg = st.number_input("Original Balance Before Transaction", min_value=0.0, step=0.01)
-newbalanceOrig = st.number_input("New Balance After Transaction", min_value=0.0, step=0.01)
-transaction_type = st.selectbox("Transaction Type", ["CASH_OUT", "TRANSFER"])
-
-# Convert transaction type to numerical
-type_mapping = {"CASH_OUT": 1, "TRANSFER": 2}
-type_encoded = type_mapping[transaction_type]
-
-# Ensure input matches training feature count
-if st.button("Predict Fraud"):
+@app.route('/predict', methods=['POST'])
+def predict():
     try:
-        # Convert input to correct format
+        data = request.get_json()
+        amount = float(data['amount'])
+        oldbalanceOrg = float(data['oldbalanceOrg'])
+        newbalanceOrig = float(data['newbalanceOrig'])
+        transaction_type = data['transaction_type']
+
+        # Convert transaction type to numerical
+        type_mapping = {"CASH_OUT": 1, "TRANSFER": 2}
+        type_encoded = type_mapping.get(transaction_type, 0)
+
+        # Prepare input for model
         input_data = np.array([[amount, oldbalanceOrg, newbalanceOrig, type_encoded]])
-        
-        # Make prediction
         prediction = model.predict(input_data)
-        
-        # Convert output to binary (0 = Legit, 1 = Fraud)
         fraud_prediction = int(prediction[0])
 
-        if fraud_prediction == 1:
-            st.error("🚨 Fraudulent Loan Transaction Detected!")
-        else:
-            st.success("✅ Transaction is Legitimate.")
+        result = {
+            "fraudulent": True if fraud_prediction == 1 else False,
+            "message": "Fraudulent Transaction Detected!" if fraud_prediction == 1 else "Transaction is Legitimate."
+        }
+
+        return jsonify(result)
     except Exception as e:
-        st.error(f"⚠️ Error: {str(e)}")
+        return jsonify({"error": str(e)})
 
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000, debug=True)
 
-# In[ ]:
 
 
 
